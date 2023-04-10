@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +16,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::get('/login', [LoginController::class, 'login'])->name('login');;
+
+Route::group(['prefix' => 'v1'], function () {
+        Route::group(['middleware' => 'auth:api'], function() {
+            Route::group(['middleware' => 'admin'], function() {
+                Route::post('/users', [UserController::class, 'index']);
+            });
+        });
 });
+
