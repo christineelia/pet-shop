@@ -10,10 +10,24 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $users = User::where('is_admin','!=', 1)
-                     ->whereNull('deleted_at')->get();
+                     ->whereNull('deleted_at');
+
+        $sortBy     = $request->input('sortBy', 'id');
+        $sortOrder  = $request->input('desc', '0');
+        if ($sortOrder == 1) {
+            $sortOrder = 'desc';
+        } else {
+            $sortOrder = 'asc';
+        }
+        $users->orderBy($sortBy, $sortOrder);
+
+        // Paginate results
+        $page       = $request->input('page', 1);
+        $perPage    = $request->input('limit', 10);
+        $users      = $users->paginate($perPage, ['*'], 'page', $page);
 
         return response()->json(['success' => 'true' , 'users' => $users]);
     }
