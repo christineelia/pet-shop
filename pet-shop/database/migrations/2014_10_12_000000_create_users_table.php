@@ -27,6 +27,7 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
             $table->timestamp('last_login_at')->nullable();
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 

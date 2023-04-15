@@ -21,7 +21,11 @@ Route::get('/login', [LoginController::class, 'login'])->name('login');;
 Route::group(['prefix' => 'v1'], function () {
         Route::group(['middleware' => 'auth:api'], function() {
             Route::group(['middleware' => 'admin'], function() {
-                Route::post('/users', [UserController::class, 'index']);
+                Route::group(['prefix' => 'admin'], function () {
+                    Route::get('/user-listing', [UserController::class, 'index']);
+                    Route::put('/user-edit/{uuid}', [UserController::class, 'update']);
+                    Route::delete('/user-delete/{uuid}', [UserController::class, 'destroy']);
+                });
             });
         });
 });
