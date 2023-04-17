@@ -14,6 +14,8 @@ use Lcobucci\JWT\Validation\Constraint\StrictValidAt;
 use Lcobucci\JWT\UnencryptedToken;
 use Lcobucci\Clock\SystemClock;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Symfony\Component\Validator\ConstraintViolation;
+
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -43,10 +45,13 @@ class AuthServiceProvider extends ServiceProvider
                 InMemory::plainText(env('JWT_PRIVATE_KEY')),
                 InMemory::plainText(env('JWT_PUBLIC_KEY'))
             );
+                if( $request->bearerToken() == null ) {
+                    throw new \Exception();
+                }
                 $jwt = $configuration->parser()->parse($request->bearerToken());
-
+                
                 if (! $jwt instanceof UnencryptedToken) {
-                    throw new ConstraintViolation('You should pass a plain token');
+                    throw new \Exception();
                 }
 
                 // Validate based on constraints
@@ -60,7 +65,7 @@ class AuthServiceProvider extends ServiceProvider
                 return \App\Models\User::find($jwt->claims()->get('id'));
                 //return Auth::loginUsingId($jwt->claims()->get('jti'));
                 
-            } catch (\Lcobucci\JWT\Exception $e) {
+            } catch (\Exception $e) {
                 return null;
             }
         });

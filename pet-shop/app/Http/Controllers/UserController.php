@@ -7,29 +7,19 @@ use App\Models\User;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
-        $users = User::where('is_admin','!=', 1)
-                     ->whereNull('deleted_at');
+        $user_id = auth()->id();
 
-        $sortBy     = $request->input('sortBy', 'id');
-        $sortOrder  = $request->input('desc', '0');
-        if ($sortOrder == 1) {
-            $sortOrder = 'desc';
-        } else {
-            $sortOrder = 'asc';
+        try {
+            $user = User::find($user_id);
+            return response()->json(['success' => 'true' , 'user' => $user]);
+
+        }catch(\Throwable $e) {
+            return response()->json(['success' => 'false' , 'user' => []]);
         }
-        $users->orderBy($sortBy, $sortOrder);
 
-        // Paginate results
-        $page       = $request->input('page', 1);
-        $perPage    = $request->input('limit', 10);
-        $users      = $users->paginate($perPage, ['*'], 'page', $page);
-
-        return response()->json(['success' => 'true' , 'users' => $users]);
+        
     }
 
     /**
@@ -69,37 +59,7 @@ class UserController extends Controller
      */
     public function update(Request $request, string $uuid)
     {
-        $user = User::where([['uuid', '=' , $uuid], ['is_admin','!=', 1]])
-                    ->whereNull('deleted_at')
-                    ->first();
-
-        if($user) {
-            if($request->has('first_name')) {
-                $user->first_name       = $request->get('first_name');
-            }
-
-            if($request->has('last_name')) {
-                $user->last_name        = $request->get('last_name');
-            }
-
-            if($request->has('email')) {
-                $user->email            = $request->get('email');
-            }
-
-            if($request->has('address')) {
-                $user->address          = $request->get('address');
-            }
-
-            if($request->has('phone_number')) {
-                $user->phone_number     = $request->get('phone_number');
-            }
-
-            $user->save();
-
-            return response()->json(['success' => 'true' , 'user' => $user , 'message' => 'Updated Successfully']);
-
-        }
-        return response()->json(['success' => 'true' , 'user' => [] , 'message' => 'Not Authorised']);
+      //
     }
 
     /**
@@ -107,10 +67,9 @@ class UserController extends Controller
      */
     public function destroy(string $uuid)
     {
-        $user = User::where([['uuid', '=' , $uuid], ['is_admin','!=', 1]])
-                    ->whereNull('deleted_at')
-                    ->first();
-        
+        $user_id = auth()->id();
+        $user = User::find($user_id);
+
         if($user) {
             $user->delete();
             return response()->json(['success' => 'true' , 'message' => 'User deleted successfully!']);

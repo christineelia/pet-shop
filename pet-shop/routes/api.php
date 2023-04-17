@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,16 +17,26 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::get('/login', [LoginController::class, 'login'])->name('login');;
-
 Route::group(['prefix' => 'v1'], function () {
+
+    // Admin Endpoints
+    Route::post('admin/login', [LoginController::class, 'login'])->name('login');
         Route::group(['middleware' => 'auth:api'], function() {
             Route::group(['middleware' => 'admin'], function() {
                 Route::group(['prefix' => 'admin'], function () {
-                    Route::get('/user-listing', [UserController::class, 'index']);
-                    Route::put('/user-edit/{uuid}', [UserController::class, 'update']);
-                    Route::delete('/user-delete/{uuid}', [UserController::class, 'destroy']);
+                    Route::get('/user-listing', [AdminController::class, 'index']);
+                    Route::put('/user-edit/{uuid}', [AdminController::class, 'update']);
+                    Route::delete('/user-delete/{uuid}', [AdminController::class, 'destroy']);
                 });
+            });
+        });
+
+    // User Endpoints
+    Route::post('user/login', [LoginController::class, 'login'])->name('login');
+        Route::group(['middleware' => 'auth:api'], function() {
+            Route::group(['middleware' => 'user'], function() {
+                    Route::get('/user', [UserController::class, 'index']);
+                    Route::delete('/user', [UserController::class, 'destroy']);
             });
         });
 });
