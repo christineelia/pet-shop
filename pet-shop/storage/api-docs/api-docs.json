@@ -1,0 +1,143 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Petshop Api Documentation",
+        "description": "Petshop Api Documentation",
+        "contact": {
+            "name": "Christine Elia",
+            "email": "christine.elia@hotmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api/v1"
+        }
+    ],
+    "paths": {
+        "/admin/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login",
+                "description": "Authenticate a user",
+                "operationId": "login",
+                "requestBody": {
+                    "description": "User credentials",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@buckhill.co.uk"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "admin"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Authentication successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Authentication failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid Login credentials"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/user-listing": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get list of non admin users",
+                "description": "Returns information about the current user if the request is authenticated",
+                "operationId": "03b5f78548d801d734c5541a4385db41",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Bearer token for authentication",
+                        "required": true
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Item per page",
+                        "required": false
+                    },
+                    {
+                        "name": "sortBy",
+                        "in": "query",
+                        "description": "Name of column",
+                        "required": false
+                    },
+                    {
+                        "name": "desc",
+                        "in": "query",
+                        "description": "1 or 0",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "403": {
+                        "description": "Unauthorised"
+                    }
+                }
+            }
+        }
+    }
+}

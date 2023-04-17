@@ -11,6 +11,39 @@ use App\Handlers\AuthHandler;
 
 class LoginController extends Controller
 {
+/**
+ * @OA\Post(
+ *     path="/admin/login",
+ *     summary="Login",
+ *     description="Authenticate a user",
+ *     operationId="login",
+ *     tags={"Authentication"},
+ *     @OA\RequestBody(
+ *         description="User credentials",
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"email","password"},
+ *             @OA\Property(property="email", type="string", format="email", example="admin@buckhill.co.uk"),
+ *             @OA\Property(property="password", type="string", example="admin")
+ *         ),
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Authentication successful",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..."),
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Authentication failed",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Invalid Login credentials")
+ *         )
+ *     )
+ * )
+ */
+
     public function login(Request $request)
     {
         $validate = \Validator::make($request->all(), [
