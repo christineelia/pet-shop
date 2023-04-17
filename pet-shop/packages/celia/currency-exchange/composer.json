@@ -1,0 +1,42 @@
+{
+    "name": "christine/currency-exchange",
+    "description": "This package will be used for calculating amount in different currencies",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Christine",
+            "email": "celia@theswan.pro"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "illuminate/support": "^8.0",
+        "guzzlehttp/guzzle": "^7.0.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Christine\\CurrencyExchange\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "CurrencyExchange\\CurrencyExchangeServiceProvider"
+            ],
+            "aliases": {
+                "CurrencyExchange": "CurrencyExchange\\CurrencyExchangeServiceProvider"
+            }
+        }
+    },
+    "require-dev": {
+        "orchestra/testbench": "6.x-dev",
+        "laravel/browser-kit-testing": "6.x-dev",
+        "phpunit/phpunit": "*"
+    }
+}
