@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
+
 
 class AdminController extends Controller
 {
@@ -88,7 +92,37 @@ class AdminController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+
+        $validatedData = $request->validate([
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+            'email' => ['required', 'email', Rule::unique('users')],
+            'password' => 'required|string|min:8|confirmed',
+            'avatar' => 'nullable|string',
+            'address' => 'nullable|string',
+            'phone_number' => 'nullable|string',
+            'marketing' => 'nullable|string',
+        ]);
+        
+            $user               = new User();
+            $user->uuid         = Str::uuid()->toString();
+            $user->first_name   = $validatedData['first_name'];
+            $user->last_name    = $validatedData['last_name'];
+            $user->email        = $validatedData['email'];
+            $user->password     = bcrypt($validatedData['password']);
+            $user->avatar       = $validatedData['avatar'];
+            $user->address      = $validatedData['address'];
+            $user->phone_number = $validatedData['phone_number'];
+            $user->is_marketing = $validatedData['marketing'];
+            $user->is_admin     = true;
+            $user->save();
+
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+       
+        return response()->json(['message' => 'Admin account created successfully'], 200);
     }
 
     /**
@@ -112,31 +146,40 @@ class AdminController extends Controller
      */
     public function update(Request $request, string $uuid)
     {
+        $rules = [
+            'first_name'    => 'required|string',
+            'last_name'     => 'required|string',
+            'email'         => [
+                'required',
+                'email',
+                Rule::unique('users')->ignore($uuid, 'uuid'),
+            ],
+            'password'      => 'sometimes|required|string|confirmed|min:8',
+            'address'       => 'required|string',
+            'phone_number'  => 'required|string',
+            'is_marketing'  => 'sometimes|string'
+        ];
+    
+        $validator = Validator::make($request->all(), $rules);
+    
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
         $user = User::where([['uuid', '=' , $uuid], ['is_admin','!=', 1]])
                     ->whereNull('deleted_at')
                     ->first();
 
         if($user) {
-            if($request->has('first_name')) {
-                $user->first_name       = $request->get('first_name');
+            $user->first_name       = $request->get('first_name');
+            $user->last_name        = $request->get('last_name');
+            $user->email            = $request->get('email');
+            $user->address          = $request->get('address');
+            if($request->has('password')) {
+                $user->password     = bcrypt($request->get('password'));
             }
-
-            if($request->has('last_name')) {
-                $user->last_name        = $request->get('last_name');
+            if($request->has('avatar')) {
+                $user->avatar     = bcrypt($request->get('avatar'));
             }
-
-            if($request->has('email')) {
-                $user->email            = $request->get('email');
-            }
-
-            if($request->has('address')) {
-                $user->address          = $request->get('address');
-            }
-
-            if($request->has('phone_number')) {
-                $user->phone_number     = $request->get('phone_number');
-            }
-
             $user->save();
 
             return response()->json(['success' => 'true' , 'user' => $user , 'message' => 'Updated Successfully']);
