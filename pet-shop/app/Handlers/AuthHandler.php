@@ -8,6 +8,7 @@ use Lcobucci\JWT\Signer\Ecdsa\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Encoding\ChainedFormatter;
+use Lcobucci\JWT\Configuration;
 
 
 class AuthHandler
@@ -33,4 +34,21 @@ class AuthHandler
 
         return $token->toString();
     }
+
+     // Token generation
+     public function InvalidateToken($user, $token)
+     {
+        $configuration = Configuration::forAsymmetricSigner(
+            new Sha256(),
+            InMemory::plainText(env('JWT_PRIVATE_KEY')),
+            InMemory::plainText(env('JWT_PUBLIC_KEY'))
+        );
+
+        $jwt = $configuration->parser()->parse($token);
+
+        $id = $jwt->claims()->get('id');
+
+        JWTAuth::getManager()->getBlacklist()->add(new \Lcobucci\JWT\Token\Plain($id));
+        
+     }
 }
