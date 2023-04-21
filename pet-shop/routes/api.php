@@ -34,7 +34,7 @@ Route::group(['prefix' => 'v1'], function () {
         });
 
     // User Endpoints
-    Route::post('user/login', [LoginController::class, 'login'])->name('login');
+    Route::post('user/login', [LoginController::class, 'login'])->name('userlogin');
         Route::group(['middleware' => 'auth:api'], function() {
             Route::group(['middleware' => 'user'], function() {
                     Route::get('/user', [UserController::class, 'index']);
